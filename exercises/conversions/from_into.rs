@@ -40,10 +40,32 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
-
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        // 1. 空字符串直接返回默认
+        if s.is_empty() {
+            return Person::default();
+        }
+
+        let parts: Vec<&str> = s.split(',').collect();
+
+        // 只允许正好两个字段（名字和年龄）
+        if parts.len() != 2 {
+            return Person::default();
+        }
+
+        let name = parts[0].trim();
+        if name.is_empty() {
+            return Person::default();
+        }
+
+        match parts[1].trim().parse::<usize>() {
+            Ok(age) => Person {
+                name: name.to_string(),
+                age,
+            },
+            Err(_) => Person::default(),
+        }
     }
 }
 
@@ -69,7 +91,7 @@ mod tests {
     #[test]
     fn test_bad_convert() {
         // Test that John is returned when bad string is provided
-        let p = Person::from("");
+        let p: Person = Person::from("");
         assert_eq!(p.name, "John");
         assert_eq!(p.age, 30);
     }
